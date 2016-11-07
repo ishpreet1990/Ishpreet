@@ -37,6 +37,5 @@ namespace Messanger
                 }
             }
         }
-        public void Producer
     }
 }
