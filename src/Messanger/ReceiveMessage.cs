@@ -16,22 +16,22 @@ namespace Messanger
         {
             var factory = new ConnectionFactory() { HostName = "localhost" };
             var connection = factory.CreateConnection();
-            channel = connection.CreateModel();
+            _channel = connection.CreateModel();
 
         }
 
-        IModel channel;
+        IModel _channel;
+
         public void Consume(Action<string> action)
         {
-            channel.QueueDeclare(queue: "message sent",
-                             durable: false,
-                             exclusive: false,
-                             autoDelete: false,
-                             arguments: null);
-            channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-            Console.WriteLine(" [*] Waiting for messages.");
+            _channel.ExchangeDeclare(exchange: "logs",type: "fanout");
 
-            var consumer = new EventingBasicConsumer(channel);
+            var queueName = _channel.QueueDeclare().QueueName;
+
+            _channel.QueueBind(queue: queueName, exchange: "logs", routingKey: "");
+            Console.WriteLine(" [*] Waiting for logs.");
+
+            var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body;
@@ -39,21 +39,17 @@ namespace Messanger
 
                 action(message);
                 Console.WriteLine("Received message is {0}", message);
-                int dots = message.Split('.').Length - 1;
-                Thread.Sleep(dots * 1000);
-                Console.WriteLine("Done");
-                Console.WriteLine(" Press [enter] to exit.");
-                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
-             channel.BasicConsume(queue: "message sent",
-                   noAck: true,
-                   consumer: consumer);
-            Console.ReadLine();
+            _channel.BasicConsume(queue: "message sent",
+                  noAck: true,
+                  consumer: consumer);
+            Console.WriteLine(" Press [enter] to see the message.");
+          //  Console.ReadLine();
         }
 
         public void Dispose()
         {
-            channel.Dispose();
+            _channel.Dispose();
         }
     }
 }

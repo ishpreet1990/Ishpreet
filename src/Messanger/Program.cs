@@ -7,13 +7,16 @@ namespace Messanger
 {
     public class Program
     {
+        ReceiveMessage receive = new ReceiveMessage();
         public static void Main(string[] args)
         {
-            ReceiveMessage receive = new ReceiveMessage();
-            receive.Consume(Console.WriteLine);
+            var receiver1 = new ReceiveMessage();
+            receiver1.Consume(Console.WriteLine);
+            var receiver2 = new ReceiveMessage();
+            receiver2.Consume(Console.WriteLine);
 
             SendMessage send = new SendMessage();
-            send.Publish(args);
+            send.Publish("");
         }
     }
 }

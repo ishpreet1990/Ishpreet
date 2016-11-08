@@ -13,31 +13,26 @@ namespace Messanger
         //string message = "Send my message";
         public SendMessage()
         {
-            var factory = new ConnectionFactory { HostName = "LocalHost" };
+            var factory = new ConnectionFactory { HostName = "localHost" };
             var connection = factory.CreateConnection();
             channel = connection.CreateModel();
-            channel.QueueDeclare(queue: "message sent",
-                        durable: false,
-                        exclusive: false,
-                        autoDelete: false,
-                        arguments: null);
+            channel.ExchangeDeclare(exchange: "logs", type: "fanout");
         }
-        public void Publish(string[] args)
+        public void Publish(string input)
         {
-            var message = GetMessage(args);
+            var message = GetMessage(input);
             var body = Encoding.UTF8.GetBytes(message);
-            var properties = channel.CreateBasicProperties();
-            properties.Persistent = true;
-            channel.BasicPublish(exchange: "",
-                routingKey: "message sent",
-                basicProperties: properties,
-                body: body);
-            Console.WriteLine(" Sent {0}", message);
+            
+            channel.BasicPublish(exchange: "logs",
+                                routingKey: "",
+                                basicProperties: null,
+                                body: body);
+            //Console.WriteLine(" Sent {0}", message);
         }
 
-        public static string GetMessage(string[] args)
+        public static string GetMessage(string input)
         {
-            return ((args.Length > 0) ? string.Join("", args) : "hello");
+            return ((input.Length > 0) ? string.Join("", input) : "info: hello how are you");
         }
 
         public void Dispose()
