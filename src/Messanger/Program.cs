@@ -10,9 +10,10 @@ namespace Messanger
         public static void Main(string[] args)
         {
             ReceiveMessage receive = new ReceiveMessage();
-            //receive.Consume(args);
+            receive.Consume(Console.WriteLine);
+
             SendMessage send = new SendMessage();
-            //send.Publish(args);
+            send.Publish(args);
         }
     }
 }

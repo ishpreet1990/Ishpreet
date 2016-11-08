@@ -42,13 +42,13 @@ namespace Messanger
                 int dots = message.Split('.').Length - 1;
                 Thread.Sleep(dots * 1000);
                 Console.WriteLine("Done");
+                Console.WriteLine(" Press [enter] to exit.");
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
              channel.BasicConsume(queue: "message sent",
                    noAck: true,
                    consumer: consumer);
-             Console.WriteLine(" Press [enter] to exit.");
-             //Console.ReadLine();
+            Console.ReadLine();
         }
 
         public void Dispose()

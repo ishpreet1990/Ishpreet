@@ -22,7 +22,7 @@ namespace Messanger
                         autoDelete: false,
                         arguments: null);
         }
-        public void Publish(string args)
+        public void Publish(string[] args)
         {
             var message = GetMessage(args);
             var body = Encoding.UTF8.GetBytes(message);
@@ -35,7 +35,7 @@ namespace Messanger
             Console.WriteLine(" Sent {0}", message);
         }
 
-        public static string GetMessage(string args)
+        public static string GetMessage(string[] args)
         {
             return ((args.Length > 0) ? string.Join("", args) : "hello");
         }
