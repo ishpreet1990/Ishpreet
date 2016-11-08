@@ -8,34 +8,46 @@ using System.Text;
 
 namespace Messanger
 {
-    public class ReceiveMessage
+    public class ReceiveMessage : IDisposable
     {
-        public void StartListening()
+        ConnectionFactory connection;
+        public ReceiveMessage()
         {
             var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
+            var connection = factory.CreateConnection();
+           channel = connection.CreateModel();
+
+        }
+
+        IModel channel;
+        public void Consume(Action<string> action)
+        {
+            var queuename = "hello"; //channel.QueueDeclare().QueueName;
+            channel.QueueDeclare(queue: queuename,
+                             durable: false,
+                             exclusive: false,
+                             autoDelete: false,
+                             arguments: null);
+
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, ea) =>
             {
-                using (var channel = connection.CreateModel())
-                {
-                    channel.QueueDeclare(queue: "My Message",
-                                         durable: false,
-                                         exclusive: false,
-                                         autoDelete: false,
-                                         arguments: null);
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body;
-                        var message = Encoding.UTF8.GetString(body);
-                        //Console.WriteLine("Received message is {0}", message);
-                    };
-                    channel.BasicConsume(queue: "My Message",
-                           noAck: true,
-                           consumer: consumer);
-                    Console.WriteLine(" Press [enter] to exit.");
-                    Console.ReadLine();
-                }
-            }
+                var body = ea.Body;
+                var message = Encoding.UTF8.GetString(body);
+
+                action(message);
+                //Console.WriteLine("Received message is {0}", s);
+            };
+            channel.BasicConsume(queue: queuename,
+                   noAck: true,
+                   consumer: consumer);
+            // Console.WriteLine(" Press [enter] to exit.");
+            // Console.ReadLine();
+        }
+
+        public void Dispose()
+        {
+            channel.Dispose();
         }
     }
 }

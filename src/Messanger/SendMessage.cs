@@ -7,31 +7,33 @@ using System.Text;
 
 namespace Messanger
 {
-    public class SendMessage
+    public class SendMessage : IDisposable
     {
-        public void SendMyMessage(string text)
+        IModel channel;
+        string message = "Send my message";
+        public SendMessage()
         {
             var factory = new ConnectionFactory { HostName = "LocalHost" };
-            using (var connection = factory.CreateConnection())
-            {
-                using (var channel = connection.CreateModel())
-                {
-                    channel.QueueDeclare(queue: "My Message",
+            var connection = factory.CreateConnection();
+            channel = connection.CreateModel();
+            channel.QueueDeclare(queue: "hello",
                         durable: false,
                         exclusive: false,
                         autoDelete: false,
                         arguments: null);
-                    string message = "Send my message";
-                    var body = Encoding.UTF8.GetBytes(message);
-                    channel.BasicPublish(exchange: "",
-                        routingKey: "My Message",
-                        basicProperties: null,
-                        body: body);
-                    Console.WriteLine("{0}", message);
-                }
-            }
-            Console.WriteLine(" Press [enter] to exit.");
-            Console.ReadLine();
+        }
+        public void Publish(string input)
+        {
+            var body = Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish(exchange: "",
+                routingKey: message,
+                basicProperties: null,
+                body: body);
+        }
+
+        public void Dispose()
+        {
+            channel.Dispose();
         }
     }
 }
