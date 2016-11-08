@@ -9,8 +9,10 @@ namespace Messanger
     {
         public static void Main(string[] args)
         {
-           // SendMessage sender = new SendMessage();
-           // ReceiveMessage receive = new ReceiveMessage();
+            ReceiveMessage receive = new ReceiveMessage();
+            //receive.Consume(args);
+            SendMessage send = new SendMessage();
+            //send.Publish(args);
         }
     }
 }

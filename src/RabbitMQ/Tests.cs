@@ -12,7 +12,7 @@ namespace RabbitQTests
 {
     public class Tests
     {
-        public string input = "Hello";
+        public string input = "hello";
 
         [Fact]
         public void SentMessage()
@@ -31,7 +31,7 @@ namespace RabbitQTests
                     sender.Publish(input);
                 }
                 
-                Assert.Equal("Hello", output);
+                Assert.Equal(input , output);
             }
 
         }
