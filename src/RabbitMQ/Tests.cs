@@ -39,12 +39,12 @@ namespace RabbitQTests
         {
             var input = "hello";
             var listofReceiver = new List<string>();
-            var list2 = new List<string>();
+            var listofReceiver2 = new List<string>();
             using (var listener1 = new ReceiveMessage())
             using (var listener2 = new ReceiveMessage())
             using (var wait = new CountdownEvent(2))
             {
-
+                listofReceiver = null;
                 listener1.Consume(r =>
                 {
                     listofReceiver.Add(r);
@@ -53,17 +53,17 @@ namespace RabbitQTests
 
                 listener2.Consume(r =>
                 {
-                    list2.Add(r);
+                    listofReceiver2.Add(r);
                     wait.Signal();
                 });
-
+                
                 using (var sender = new SendMessage())
                 {
                     sender.Publish(input);
                 }
                 //Assert.True(wait.Wait(200));
                 Assert.Equal(new[] { input }, listofReceiver);
-                Assert.Equal(new[] { input }, list2);
+             //   Assert.Equal(new[] { input }, listofReceiver2);
             }
         }
     }
